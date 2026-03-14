@@ -310,9 +310,9 @@ IDispatchEx : IDispatch
         long id,
         unsigned long lcid,
         unsigned long dwFlags,
-        struct DISPPARAMS * pdp,
+        DISPPARAMS * pdp,
         VARIANT * pvarRes,
-        struct EXCEPINFO * pei,
+        EXCEPINFO * pei,
         struct IServiceProvider * pspCaller,
         unsigned int cvarRefArg,
         unsigned int * rgiRefArg,
@@ -348,9 +348,9 @@ IDispatchEx : IDispatch
         /*[in]*/ long id,
         /*[in]*/ unsigned long lcid,
         /*[in]*/ unsigned long dwFlags,
-        /*[in]*/ struct DISPPARAMS * pdp,
+        /*[in]*/ DISPPARAMS * pdp,
         /*[out]*/ VARIANT * pvarRes,
-        /*[out]*/ struct EXCEPINFO * pei,
+        /*[out]*/ EXCEPINFO * pei,
         /*[in]*/ struct IServiceProvider * pspCaller,
         /*[in]*/ unsigned int cvarRefArg,
         /*[in]*/ unsigned int * rgiRefArg,
@@ -395,169 +395,169 @@ namespace Sexy
 
 class FlashSink : public ShockwaveFlashObjects::_IShockwaveFlashEvents
 {
-public:	
-	LPCONNECTIONPOINT		mConnectionPoint;	
-	DWORD					mCookie;
-	int						mRefCount;
-	FlashWidget*			mFlashWidget;
+public: 
+        LPCONNECTIONPOINT               mConnectionPoint;       
+        DWORD                                   mCookie;
+        int                                             mRefCount;
+        FlashWidget*                    mFlashWidget;
 
 public:
-	FlashSink()
-	{		
-		mCookie = 0;
-		mConnectionPoint = NULL;
-		mRefCount = 0;
-		mFlashWidget = NULL;		
-	}
+        FlashSink()
+        {               
+                mCookie = 0;
+                mConnectionPoint = NULL;
+                mRefCount = 0;
+                mFlashWidget = NULL;            
+        }
 
-	virtual ~FlashSink()
-	{
-		mFlashWidget->mCOMCount--;
-	}
+        virtual ~FlashSink()
+        {
+                mFlashWidget->mCOMCount--;
+        }
 
-	HRESULT Init(FlashWidget* theFlashWidget)
-	{
-		mFlashWidget = theFlashWidget;
-		mFlashWidget->mCOMCount++;
+        HRESULT Init(FlashWidget* theFlashWidget)
+        {
+                mFlashWidget = theFlashWidget;
+                mFlashWidget->mCOMCount++;
 
-		HRESULT aResult = NOERROR;
-		LPCONNECTIONPOINTCONTAINER aConnectionPoint = NULL;
-						
-		if ((mFlashWidget->mFlashInterface->QueryInterface(IID_IConnectionPointContainer, (void**) &aConnectionPoint) == S_OK) &&
-			(aConnectionPoint->FindConnectionPoint(__uuidof(ShockwaveFlashObjects::_IShockwaveFlashEvents), &mConnectionPoint) == S_OK))			
-		{
-			IDispatch* aDispatch = NULL;
-			QueryInterface(__uuidof(IDispatch), (void**) &aDispatch);
-			if (aDispatch != NULL)
-			{
-				aResult = mConnectionPoint->Advise((LPUNKNOWN)aDispatch, &mCookie);
-				aDispatch->Release();
-			}
-		}
-				
-		if (aConnectionPoint != NULL) 
-			aConnectionPoint->Release();
+                HRESULT aResult = NOERROR;
+                LPCONNECTIONPOINTCONTAINER aConnectionPoint = NULL;
+                                                
+                if ((mFlashWidget->mFlashInterface->QueryInterface(IID_IConnectionPointContainer, (void**) &aConnectionPoint) == S_OK) &&
+                        (aConnectionPoint->FindConnectionPoint(__uuidof(ShockwaveFlashObjects::_IShockwaveFlashEvents), &mConnectionPoint) == S_OK))                    
+                {
+                        IDispatch* aDispatch = NULL;
+                        QueryInterface(__uuidof(IDispatch), (void**) &aDispatch);
+                        if (aDispatch != NULL)
+                        {
+                                aResult = mConnectionPoint->Advise((LPUNKNOWN)aDispatch, &mCookie);
+                                aDispatch->Release();
+                        }
+                }
+                                
+                if (aConnectionPoint != NULL) 
+                        aConnectionPoint->Release();
 
-		return aResult;
-	}
+                return aResult;
+        }
 
-	HRESULT Shutdown()
-	{
-		HRESULT aResult = S_OK;
+        HRESULT Shutdown()
+        {
+                HRESULT aResult = S_OK;
 
-		if (mConnectionPoint)
-		{
-			if (mCookie)
-			{
-				aResult = mConnectionPoint->Unadvise(mCookie);
-				mCookie = 0;
-			}
+                if (mConnectionPoint)
+                {
+                        if (mCookie)
+                        {
+                                aResult = mConnectionPoint->Unadvise(mCookie);
+                                mCookie = 0;
+                        }
 
-			mConnectionPoint->Release();
-			mConnectionPoint = NULL;
-		}
+                        mConnectionPoint->Release();
+                        mConnectionPoint = NULL;
+                }
 
-		return aResult;
-	}
+                return aResult;
+        }
  
-	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, LPVOID* ppv)
-	{
-		*ppv = NULL;
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, LPVOID* ppv)
+        {
+                *ppv = NULL;
 
-		if (riid == IID_IUnknown)
-		{
-			*ppv = (LPUNKNOWN)this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == IID_IDispatch)
-		{
-			*ppv = (IDispatch*)this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == __uuidof(ShockwaveFlashObjects::_IShockwaveFlashEvents))
-		{
-			*ppv = (ShockwaveFlashObjects::_IShockwaveFlashEvents*) this;
-			AddRef();
-			return S_OK;
-		}
-		else
-		{   
-			return E_NOTIMPL;
-		}
-	}
+                if (riid == IID_IUnknown)
+                {
+                        *ppv = (LPUNKNOWN)this;
+                        AddRef();
+                        return S_OK;
+                }
+                else if (riid == IID_IDispatch)
+                {
+                        *ppv = (IDispatch*)this;
+                        AddRef();
+                        return S_OK;
+                }
+                else if (riid == __uuidof(ShockwaveFlashObjects::_IShockwaveFlashEvents))
+                {
+                        *ppv = (ShockwaveFlashObjects::_IShockwaveFlashEvents*) this;
+                        AddRef();
+                        return S_OK;
+                }
+                else
+                {   
+                        return E_NOTIMPL;
+                }
+        }
 
-	ULONG STDMETHODCALLTYPE AddRef()
-	{  
-		return ++mRefCount;
-	}
+        ULONG STDMETHODCALLTYPE AddRef()
+        {  
+                return ++mRefCount;
+        }
 
-	ULONG STDMETHODCALLTYPE Release()
-	{  
-		int aRefCount = --mRefCount;
-		if (aRefCount == 0)		
-			delete this;		
+        ULONG STDMETHODCALLTYPE Release()
+        {  
+                int aRefCount = --mRefCount;
+                if (aRefCount == 0)             
+                        delete this;            
 
-		return aRefCount;
-	}
+                return aRefCount;
+        }
 
  // IDispatch method
   virtual HRESULT STDMETHODCALLTYPE GetTypeInfoCount(UINT* pctinfo)
    { return E_NOTIMPL; }
 
-	virtual HRESULT STDMETHODCALLTYPE GetTypeInfo(UINT iTInfo, LCID lcid, ITypeInfo** ppTInfo)
-	{
-		return E_NOTIMPL; 
-	}
+        virtual HRESULT STDMETHODCALLTYPE GetTypeInfo(UINT iTInfo, LCID lcid, ITypeInfo** ppTInfo)
+        {
+                return E_NOTIMPL; 
+        }
 
-	virtual HRESULT STDMETHODCALLTYPE GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
-		UINT cNames, LCID lcid,DISPID* rgDispId)
-	{
-		return E_NOTIMPL; 
-	}
+        virtual HRESULT STDMETHODCALLTYPE GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
+                UINT cNames, LCID lcid,DISPID* rgDispId)
+        {
+                return E_NOTIMPL; 
+        }
 
-	virtual HRESULT STDMETHODCALLTYPE Invoke(DISPID dispIdMember, REFIID riid, LCID lcid,
-		WORD wFlags, ::DISPPARAMS __RPC_FAR *pDispParams, VARIANT __RPC_FAR *pVarResult,
-		::EXCEPINFO __RPC_FAR *pExcepInfo, UINT __RPC_FAR *puArgErr)
-	{
-		switch(dispIdMember)
-		{
-		case 0x7a6:			
-			break;
-		case 0x96:			
-			if ((pDispParams->cArgs == 2) &&
-				(pDispParams->rgvarg[0].vt == VT_BSTR) &&
-				(pDispParams->rgvarg[1].vt == VT_BSTR))
-			{
-				FSCommand(pDispParams->rgvarg[1].bstrVal, pDispParams->rgvarg[0].bstrVal);
-			}
-			break;
-		case DISPID_READYSTATECHANGE:					
-			break;
-		default:			
-			return DISP_E_MEMBERNOTFOUND;
-		} 
-		
-		return NOERROR;
-	}
+        virtual HRESULT STDMETHODCALLTYPE Invoke(DISPID dispIdMember, REFIID riid, LCID lcid,
+                WORD wFlags, ::DISPPARAMS __RPC_FAR *pDispParams, VARIANT __RPC_FAR *pVarResult,
+                ::EXCEPINFO __RPC_FAR *pExcepInfo, UINT __RPC_FAR *puArgErr)
+        {
+                switch(dispIdMember)
+                {
+                case 0x7a6:                     
+                        break;
+                case 0x96:                      
+                        if ((pDispParams->cArgs == 2) &&
+                                (pDispParams->rgvarg[0].vt == VT_BSTR) &&
+                                (pDispParams->rgvarg[1].vt == VT_BSTR))
+                        {
+                                FSCommand(pDispParams->rgvarg[1].bstrVal, pDispParams->rgvarg[0].bstrVal);
+                        }
+                        break;
+                case DISPID_READYSTATECHANGE:                                   
+                        break;
+                default:                        
+                        return DISP_E_MEMBERNOTFOUND;
+                } 
+                
+                return NOERROR;
+        }
 
-	HRESULT OnReadyStateChange (long newState)
-	{	
-		return S_OK;
-	}
+        HRESULT OnReadyStateChange (long newState)
+        {       
+                return S_OK;
+        }
     
-	HRESULT OnProgress(long percentDone )
-	{		
-		return S_OK;
-	}
+        HRESULT OnProgress(long percentDone )
+        {               
+                return S_OK;
+        }
 
-	HRESULT FSCommand (_bstr_t command, _bstr_t args)
-	{
-		if (mFlashWidget->mFlashListener != NULL)
-			mFlashWidget->mFlashListener->FlashCommand(mFlashWidget->mId, (char*) command, (char*) args);
-		return S_OK;
-	}	
+        HRESULT FSCommand (_bstr_t command, _bstr_t args)
+        {
+                if (mFlashWidget->mFlashListener != NULL)
+                        mFlashWidget->mFlashListener->FlashCommand(mFlashWidget->mId, (char*) command, (char*) args);
+                return S_OK;
+        }       
 };
 
 }
@@ -570,331 +570,331 @@ using namespace ShockwaveFlashObjects;
 namespace Sexy
 {
 
-class ControlSite : 	
-	public IOleInPlaceSiteWindowless, 
-	public IOleClientSite	
+class ControlSite :     
+        public IOleInPlaceSiteWindowless, 
+        public IOleClientSite   
 {
 public:
-	int						mRefCount;
-	FlashWidget*			mFlashWidget;
+        int                                             mRefCount;
+        FlashWidget*                    mFlashWidget;
 
 public:
-	ControlSite()
-	{		
-		mRefCount = 0;		
-		mFlashWidget = NULL;
-	}	
+        ControlSite()
+        {               
+                mRefCount = 0;          
+                mFlashWidget = NULL;
+        }       
 
-	virtual ~ControlSite()
-	{
-		if (mFlashWidget != NULL)
-			mFlashWidget->mCOMCount--;
-	}
+        virtual ~ControlSite()
+        {
+                if (mFlashWidget != NULL)
+                        mFlashWidget->mCOMCount--;
+        }
 
-	void Init(FlashWidget* theFlashWidget)
-	{
-		mFlashWidget = theFlashWidget;
-		mFlashWidget->mCOMCount++;
-	}
+        void Init(FlashWidget* theFlashWidget)
+        {
+                mFlashWidget = theFlashWidget;
+                mFlashWidget->mCOMCount++;
+        }
 
-	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, LPVOID* ppv)
-	{
-		*ppv = NULL;
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, LPVOID* ppv)
+        {
+                *ppv = NULL;
 
-		if (riid == IID_IUnknown)
-		{
-			*ppv = (IUnknown*) (IOleWindow*) this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == IID_IOleWindow)
-		{
-			*ppv = (IOleWindow*)this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == IID_IOleInPlaceSite)
-		{
-			*ppv = (IOleInPlaceSite*)this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == IID_IOleInPlaceSiteEx)
-		{
-			*ppv = (IOleInPlaceSiteEx*)this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == IID_IOleInPlaceSiteWindowless)
-		{
-			*ppv = (IOleInPlaceSiteWindowless*)this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == IID_IOleClientSite)
-		{
-			*ppv = (IOleClientSite*)this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == __uuidof(ShockwaveFlashObjects::_IShockwaveFlashEvents))
-		{
-			*ppv = (ShockwaveFlashObjects::_IShockwaveFlashEvents*) this;
-			AddRef();
-			return S_OK;
-		}
-		else
-		{   
-			return E_NOTIMPL;
-		}
-	}
+                if (riid == IID_IUnknown)
+                {
+                        *ppv = (IUnknown*) (IOleWindow*) this;
+                        AddRef();
+                        return S_OK;
+                }
+                else if (riid == IID_IOleWindow)
+                {
+                        *ppv = (IOleWindow*)this;
+                        AddRef();
+                        return S_OK;
+                }
+                else if (riid == IID_IOleInPlaceSite)
+                {
+                        *ppv = (IOleInPlaceSite*)this;
+                        AddRef();
+                        return S_OK;
+                }
+                else if (riid == IID_IOleInPlaceSiteEx)
+                {
+                        *ppv = (IOleInPlaceSiteEx*)this;
+                        AddRef();
+                        return S_OK;
+                }
+                else if (riid == IID_IOleInPlaceSiteWindowless)
+                {
+                        *ppv = (IOleInPlaceSiteWindowless*)this;
+                        AddRef();
+                        return S_OK;
+                }
+                else if (riid == IID_IOleClientSite)
+                {
+                        *ppv = (IOleClientSite*)this;
+                        AddRef();
+                        return S_OK;
+                }
+                else if (riid == __uuidof(ShockwaveFlashObjects::_IShockwaveFlashEvents))
+                {
+                        *ppv = (ShockwaveFlashObjects::_IShockwaveFlashEvents*) this;
+                        AddRef();
+                        return S_OK;
+                }
+                else
+                {   
+                        return E_NOTIMPL;
+                }
+        }
 
-	ULONG STDMETHODCALLTYPE AddRef()
-	{  
-		return ++mRefCount;
-	}
+        ULONG STDMETHODCALLTYPE AddRef()
+        {  
+                return ++mRefCount;
+        }
 
-	ULONG STDMETHODCALLTYPE Release()
-	{ 
-		int aRefCount = --mRefCount;
-		if (aRefCount == 0)		
-			delete this;		
+        ULONG STDMETHODCALLTYPE Release()
+        { 
+                int aRefCount = --mRefCount;
+                if (aRefCount == 0)             
+                        delete this;            
 
-		return aRefCount;
-	}
+                return aRefCount;
+        }
 
-	//////////////////////////////////////////////////////////////////////////	
+        //////////////////////////////////////////////////////////////////////////      
 
-	virtual HRESULT  STDMETHODCALLTYPE SaveObject(void)
-	{
-		return S_OK;
-	}
+        virtual HRESULT  STDMETHODCALLTYPE SaveObject(void)
+        {
+                return S_OK;
+        }
 
-	virtual HRESULT  STDMETHODCALLTYPE GetMoniker(DWORD dwAssign, DWORD dwWhichMoniker,IMoniker** ppmk )
-	{
-		*ppmk = NULL;
-		return E_NOTIMPL;
-	}
+        virtual HRESULT  STDMETHODCALLTYPE GetMoniker(DWORD dwAssign, DWORD dwWhichMoniker,IMoniker** ppmk )
+        {
+                *ppmk = NULL;
+                return E_NOTIMPL;
+        }
 
-	virtual HRESULT STDMETHODCALLTYPE GetContainer(IOleContainer ** theContainerP)
-	{
-		//return QueryInterface(__uuidof(IOleContainer), (void**) theContainerP);				
-		return E_NOINTERFACE;
-	}
-
-
-	virtual HRESULT  STDMETHODCALLTYPE ShowObject(void)
-	{
-		return E_NOTIMPL;
-	}
-
-	virtual HRESULT  STDMETHODCALLTYPE OnShowWindow(BOOL)
-	{
-		return E_NOTIMPL;
-	}
-
-	virtual HRESULT  STDMETHODCALLTYPE RequestNewObjectLayout(void)
-	{
-		return E_NOTIMPL;
-	}
-		//		
-	
-
-	HRESULT STDMETHODCALLTYPE ContextSensitiveHelp(/* [in] */ BOOL fEnterMode)
-	{
-	    return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE GetWindow(/* [out] */ HWND __RPC_FAR* theWnndow)
-	{
-		return E_FAIL;
-
-	    //*theWnndow = NULL;
-		//*theWnndow = gSexyAppBase->mHWnd;
-		//return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE CanInPlaceActivate(void)
-	{
-		return S_OK;
-	}
+        virtual HRESULT STDMETHODCALLTYPE GetContainer(IOleContainer ** theContainerP)
+        {
+                //return QueryInterface(__uuidof(IOleContainer), (void**) theContainerP);                               
+                return E_NOINTERFACE;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE OnInPlaceActivate(void)
-	{		
-		return S_OK;
-	}
+        virtual HRESULT  STDMETHODCALLTYPE ShowObject(void)
+        {
+                return E_NOTIMPL;
+        }
+
+        virtual HRESULT  STDMETHODCALLTYPE OnShowWindow(BOOL)
+        {
+                return E_NOTIMPL;
+        }
+
+        virtual HRESULT  STDMETHODCALLTYPE RequestNewObjectLayout(void)
+        {
+                return E_NOTIMPL;
+        }
+                //              
+        
+
+        HRESULT STDMETHODCALLTYPE ContextSensitiveHelp(/* [in] */ BOOL fEnterMode)
+        {
+            return S_OK;
+        }
+
+        HRESULT STDMETHODCALLTYPE GetWindow(/* [out] */ HWND __RPC_FAR* theWnndow)
+        {
+                return E_FAIL;
+
+            //*theWnndow = NULL;
+                //*theWnndow = gSexyAppBase->mHWnd;
+                //return S_OK;
+        }
+
+        HRESULT STDMETHODCALLTYPE CanInPlaceActivate(void)
+        {
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE OnUIActivate(void)
-	{		
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE OnInPlaceActivate(void)
+        {               
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE GetWindowContext(/* [out] */ IOleInPlaceFrame __RPC_FAR *__RPC_FAR *ppFrame, /* [out] */ IOleInPlaceUIWindow __RPC_FAR *__RPC_FAR *ppDoc, /* [out] */ LPRECT lprcPosRect, /* [out] */ LPRECT lprcClipRect, /* [out][in] */ LPOLEINPLACEFRAMEINFO lpFrameInfo)
-	{
-		RECT aRect = mFlashWidget->GetRect().ToRECT();
-
-		*lprcPosRect = aRect;
-		*lprcClipRect = aRect;
-		
-		*ppFrame = NULL;
-		QueryInterface(__uuidof(IOleInPlaceFrame), (void**) ppFrame);		
-		*ppDoc = NULL;
-
-		lpFrameInfo->fMDIApp = FALSE;
-		lpFrameInfo->hwndFrame = NULL;
-		lpFrameInfo->haccel = NULL;
-		lpFrameInfo->cAccelEntries = 0;
-		
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE OnUIActivate(void)
+        {               
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE Scroll(/* [in] */ SIZE scrollExtant)
-	{
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE GetWindowContext(/* [out] */ IOleInPlaceFrame __RPC_FAR *__RPC_FAR *ppFrame, /* [out] */ IOleInPlaceUIWindow __RPC_FAR *__RPC_FAR *ppDoc, /* [out] */ LPRECT lprcPosRect, /* [out] */ LPRECT lprcClipRect, /* [out][in] */ LPOLEINPLACEFRAMEINFO lpFrameInfo)
+        {
+                RECT aRect = mFlashWidget->GetRect().ToRECT();
+
+                *lprcPosRect = aRect;
+                *lprcClipRect = aRect;
+                
+                *ppFrame = NULL;
+                QueryInterface(__uuidof(IOleInPlaceFrame), (void**) ppFrame);           
+                *ppDoc = NULL;
+
+                lpFrameInfo->fMDIApp = FALSE;
+                lpFrameInfo->hwndFrame = NULL;
+                lpFrameInfo->haccel = NULL;
+                lpFrameInfo->cAccelEntries = 0;
+                
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE OnUIDeactivate(/* [in] */ BOOL fUndoable)
-	{		
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE Scroll(/* [in] */ SIZE scrollExtant)
+        {
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE OnInPlaceDeactivate(void)
-	{	
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE OnUIDeactivate(/* [in] */ BOOL fUndoable)
+        {               
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE DiscardUndoState(void)
-	{
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE OnInPlaceDeactivate(void)
+        {       
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE DeactivateAndUndo(void)
-	{
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE DiscardUndoState(void)
+        {
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE OnPosRectChange(/* [in] */ LPCRECT lprcPosRect)
-	{
-		return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE OnInPlaceActivateEx(/* [out] */ BOOL __RPC_FAR *pfNoRedraw, /* [in] */ DWORD dwFlags)
-	{		
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE DeactivateAndUndo(void)
+        {
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE OnInPlaceDeactivateEx(/* [in] */ BOOL fNoRedraw)
-	{		
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE OnPosRectChange(/* [in] */ LPCRECT lprcPosRect)
+        {
+                return S_OK;
+        }
+
+        HRESULT STDMETHODCALLTYPE OnInPlaceActivateEx(/* [out] */ BOOL __RPC_FAR *pfNoRedraw, /* [in] */ DWORD dwFlags)
+        {               
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE RequestUIActivate(void)
-	{
-		return S_FALSE;
-	}
+        HRESULT STDMETHODCALLTYPE OnInPlaceDeactivateEx(/* [in] */ BOOL fNoRedraw)
+        {               
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE CanWindowlessActivate(void)
-	{
-		// Allow windowless activation?
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE RequestUIActivate(void)
+        {
+                return S_FALSE;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE GetCapture(void)
-	{
-		// TODO capture the mouse for the object
-		return S_FALSE;
-	}
+        HRESULT STDMETHODCALLTYPE CanWindowlessActivate(void)
+        {
+                // Allow windowless activation?
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE SetCapture(/* [in] */ BOOL fCapture)
-	{
-		// TODO capture the mouse for the object
-		return S_FALSE;
-	}
+        HRESULT STDMETHODCALLTYPE GetCapture(void)
+        {
+                // TODO capture the mouse for the object
+                return S_FALSE;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE GetFocus(void)
-	{
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE SetCapture(/* [in] */ BOOL fCapture)
+        {
+                // TODO capture the mouse for the object
+                return S_FALSE;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE SetFocus(/* [in] */ BOOL fFocus)
-	{
-		return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE GetDC(/* [in] */ LPCRECT pRect, /* [in] */ DWORD grfFlags, /* [out] */ HDC __RPC_FAR *phDC)
-	{		
-		return E_INVALIDARG;		
-	}
+        HRESULT STDMETHODCALLTYPE GetFocus(void)
+        {
+                return S_OK;
+        }
 
 
-	HRESULT STDMETHODCALLTYPE ReleaseDC(/* [in] */ HDC hDC)
-	{
-		return E_INVALIDARG;
-	}
+        HRESULT STDMETHODCALLTYPE SetFocus(/* [in] */ BOOL fFocus)
+        {
+                return S_OK;
+        }
+
+        HRESULT STDMETHODCALLTYPE GetDC(/* [in] */ LPCRECT pRect, /* [in] */ DWORD grfFlags, /* [out] */ HDC __RPC_FAR *phDC)
+        {               
+                return E_INVALIDARG;            
+        }
 
 
-	HRESULT STDMETHODCALLTYPE InvalidateRect(/* [in] */ LPCRECT pRect, /* [in] */ BOOL fErase)
-	{	
-		if (pRect == NULL)
-		{
-			mFlashWidget->mDirtyRect = mFlashWidget->GetRect();
-			mFlashWidget->mFlashDirty = true;
-		}
-		else if (!mFlashWidget->mFlashDirty)
-		{
-			mFlashWidget->mDirtyRect = Rect(pRect->left, pRect->top, pRect->right - pRect->left, pRect->bottom - pRect->top);
-			mFlashWidget->mFlashDirty = true;
-		}
-		else
-		{			
-			mFlashWidget->mDirtyRect = mFlashWidget->mDirtyRect.Union(Rect(pRect->left, pRect->top, pRect->right - pRect->left, pRect->bottom - pRect->top));
-		}		
-		
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE ReleaseDC(/* [in] */ HDC hDC)
+        {
+                return E_INVALIDARG;
+        }
 
-	HRESULT STDMETHODCALLTYPE InvalidateRgn(/* [in] */ HRGN hRGN, /* [in] */ BOOL fErase)
-	{	
-		mFlashWidget->mDirtyRect = mFlashWidget->GetRect();
-		mFlashWidget->mFlashDirty = true;
-		return S_OK;
-	}
 
-	HRESULT STDMETHODCALLTYPE ScrollRect(/* [in] */ INT dx, /* [in] */ INT dy, /* [in] */ LPCRECT pRectScroll, /* [in] */ LPCRECT pRectClip)
-	{
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE InvalidateRect(/* [in] */ LPCRECT pRect, /* [in] */ BOOL fErase)
+        {       
+                if (pRect == NULL)
+                {
+                        mFlashWidget->mDirtyRect = mFlashWidget->GetRect();
+                        mFlashWidget->mFlashDirty = true;
+                }
+                else if (!mFlashWidget->mFlashDirty)
+                {
+                        mFlashWidget->mDirtyRect = Rect(pRect->left, pRect->top, pRect->right - pRect->left, pRect->bottom - pRect->top);
+                        mFlashWidget->mFlashDirty = true;
+                }
+                else
+                {                       
+                        mFlashWidget->mDirtyRect = mFlashWidget->mDirtyRect.Union(Rect(pRect->left, pRect->top, pRect->right - pRect->left, pRect->bottom - pRect->top));
+                }               
+                
+                return S_OK;
+        }
 
-	HRESULT STDMETHODCALLTYPE AdjustRect(/* [out][in] */ LPRECT prc)
-	{
-		if (prc == NULL)
-		{
-			return E_INVALIDARG;
-		}
-		
-		return S_OK;
-	}
+        HRESULT STDMETHODCALLTYPE InvalidateRgn(/* [in] */ HRGN hRGN, /* [in] */ BOOL fErase)
+        {       
+                mFlashWidget->mDirtyRect = mFlashWidget->GetRect();
+                mFlashWidget->mFlashDirty = true;
+                return S_OK;
+        }
 
-	HRESULT STDMETHODCALLTYPE OnDefWindowMessage(/* [in] */ UINT msg, /* [in] */ WPARAM wParam, /* [in] */ LPARAM lParam, /* [out] */ LRESULT __RPC_FAR *plResult)
-	{
-		return S_FALSE;
-	}
+        HRESULT STDMETHODCALLTYPE ScrollRect(/* [in] */ INT dx, /* [in] */ INT dy, /* [in] */ LPCRECT pRectScroll, /* [in] */ LPCRECT pRectClip)
+        {
+                return S_OK;
+        }
+
+        HRESULT STDMETHODCALLTYPE AdjustRect(/* [out][in] */ LPRECT prc)
+        {
+                if (prc == NULL)
+                {
+                        return E_INVALIDARG;
+                }
+                
+                return S_OK;
+        }
+
+        HRESULT STDMETHODCALLTYPE OnDefWindowMessage(/* [in] */ UINT msg, /* [in] */ WPARAM wParam, /* [in] */ LPARAM lParam, /* [out] */ LRESULT __RPC_FAR *plResult)
+        {
+                return S_FALSE;
+        }
 };
 
 }
@@ -908,477 +908,477 @@ typedef HRESULT (__stdcall *DllGetClassObjectFunc)(REFCLSID rclsid, REFIID riid,
 
 FlashWidget::FlashWidget(int theId, FlashListener* theFlashListener)
 {
-	HRESULT aResult;
+        HRESULT aResult;
 
-	mState = STATE_IDLE;
+        mState = STATE_IDLE;
 
-	mCurCursor = CURSOR_POINTER;
-	mCurOverrideCursor = NULL;
+        mCurCursor = CURSOR_POINTER;
+        mCurOverrideCursor = NULL;
 
-	mCOMCount = 0;
-	mPauseCount = 0;
-	mAutoPause = true;
-	mHasLostFocus = !gSexyAppBase->mHasFocus;
-	mFlashDirty = true;	
+        mCOMCount = 0;
+        mPauseCount = 0;
+        mAutoPause = true;
+        mHasLostFocus = !gSexyAppBase->mHasFocus;
+        mFlashDirty = true;     
 
-	mBkgColor.mAlpha = 0;
-	mId = theId;
-	mFlashListener = theFlashListener;	
+        mBkgColor.mAlpha = 0;
+        mId = theId;
+        mFlashListener = theFlashListener;      
 
-	mFlashSink = NULL;
-	
-	mImage = NULL;	
-	mFlashInterface = NULL;
-	mOleObject = NULL;
-	mWindowlessObject = NULL;
+        mFlashSink = NULL;
+        
+        mImage = NULL;  
+        mFlashInterface = NULL;
+        mOleObject = NULL;
+        mWindowlessObject = NULL;
 
-	mBkgImage = NULL;
-	mFlashLibHandle = NULL;
+        mBkgImage = NULL;
+        mFlashLibHandle = NULL;
 
-	CoInitialize(NULL);
+        CoInitialize(NULL);
 
-	mControlSite = new ControlSite();
-	mControlSite->AddRef();	
-	mControlSite->Init(this);
-		
-	mFlashLibHandle = LoadLibraryA("flash.ocx");
-	if (mFlashLibHandle != NULL)
-	{
-		IClassFactory* aClassFactory = NULL;
-		DllGetClassObjectFunc aDllGetClassObjectFunc = (DllGetClassObjectFunc) GetProcAddress(mFlashLibHandle, "DllGetClassObject");
-		aResult = aDllGetClassObjectFunc(CLSID_ShockwaveFlash, IID_IClassFactory, (void**)&aClassFactory);
-		aClassFactory->CreateInstance(NULL, IID_IOleObject, (void**)&mOleObject);
-		aClassFactory->Release();	
-	}
-	else
-	{
-		CoCreateInstance(CLSID_ShockwaveFlash, NULL, 
-			CLSCTX_INPROC_SERVER,
-			IID_IOleObject,
-			(void**)&mOleObject);
-	}
+        mControlSite = new ControlSite();
+        mControlSite->AddRef(); 
+        mControlSite->Init(this);
+                
+        mFlashLibHandle = LoadLibraryA("flash.ocx");
+        if (mFlashLibHandle != NULL)
+        {
+                IClassFactory* aClassFactory = NULL;
+                DllGetClassObjectFunc aDllGetClassObjectFunc = (DllGetClassObjectFunc) GetProcAddress(mFlashLibHandle, "DllGetClassObject");
+                aResult = aDllGetClassObjectFunc(CLSID_ShockwaveFlash, IID_IClassFactory, (void**)&aClassFactory);
+                aClassFactory->CreateInstance(NULL, IID_IOleObject, (void**)&mOleObject);
+                aClassFactory->Release();       
+        }
+        else
+        {
+                CoCreateInstance(CLSID_ShockwaveFlash, NULL, 
+                        CLSCTX_INPROC_SERVER,
+                        IID_IOleObject,
+                        (void**)&mOleObject);
+        }
 
-	IOleClientSite* aClientSite = NULL;
-	mControlSite->QueryInterface(__uuidof(IOleClientSite), (void**) &aClientSite);
-	mOleObject->SetClientSite(aClientSite);	
+        IOleClientSite* aClientSite = NULL;
+        mControlSite->QueryInterface(__uuidof(IOleClientSite), (void**) &aClientSite);
+        mOleObject->SetClientSite(aClientSite); 
 
-	mOleObject->QueryInterface(__uuidof(IShockwaveFlash), (LPVOID*) &mFlashInterface);
-	_bstr_t aTrans = "Transparent";
-	mFlashInterface->put_WMode(aTrans);
+        mOleObject->QueryInterface(__uuidof(IShockwaveFlash), (LPVOID*) &mFlashInterface);
+        _bstr_t aTrans = "Transparent";
+        mFlashInterface->put_WMode(aTrans);
 
-	aResult = mOleObject->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, aClientSite, 0, NULL, NULL);
-	aClientSite->Release();	
-		
-	mOleObject->QueryInterface(__uuidof(IOleInPlaceObjectWindowless), (LPVOID*) &mWindowlessObject);
-			
-	mFlashSink = new FlashSink();
-	mFlashSink->AddRef();	
-	mFlashSink->Init(this);
+        aResult = mOleObject->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, aClientSite, 0, NULL, NULL);
+        aClientSite->Release(); 
+                
+        mOleObject->QueryInterface(__uuidof(IOleInPlaceObjectWindowless), (LPVOID*) &mWindowlessObject);
+                        
+        mFlashSink = new FlashSink();
+        mFlashSink->AddRef();   
+        mFlashSink->Init(this);
 }
 
 FlashWidget::~FlashWidget()
 {
-	CleanupImages();
-		
-	if (mWindowlessObject != NULL)
-		mWindowlessObject->Release();
-	if (mFlashInterface != NULL)
-		mFlashInterface->Release();	
+        CleanupImages();
+                
+        if (mWindowlessObject != NULL)
+                mWindowlessObject->Release();
+        if (mFlashInterface != NULL)
+                mFlashInterface->Release();     
 
-	if (mFlashSink != NULL)
-	{
-		mFlashSink->Shutdown();
-		mFlashSink->Release();
-	}
+        if (mFlashSink != NULL)
+        {
+                mFlashSink->Shutdown();
+                mFlashSink->Release();
+        }
 
-	mOleObject->Close(OLECLOSE_NOSAVE);
-		
-	if (mOleObject != NULL)
-		mOleObject->Release();	
+        mOleObject->Close(OLECLOSE_NOSAVE);
+                
+        if (mOleObject != NULL)
+                mOleObject->Release();  
 
-	if (mControlSite != NULL)
-		mControlSite->Release();
+        if (mControlSite != NULL)
+                mControlSite->Release();
 
-	// Make sure all our COM objects were actually destroyed
-	DBG_ASSERTE(mCOMCount == 0);
+        // Make sure all our COM objects were actually destroyed
+        DBG_ASSERTE(mCOMCount == 0);
 
-	if (mFlashLibHandle != NULL)
-		FreeLibrary(mFlashLibHandle);	
+        if (mFlashLibHandle != NULL)
+                FreeLibrary(mFlashLibHandle);   
 }
 
 double FlashWidget::GetFlashVersion()
 {
-	CoInitialize(NULL);
+        CoInitialize(NULL);
 
-	IOleObject* anOleObject = NULL;
-	if (FAILED(CoCreateInstance(CLSID_ShockwaveFlash, NULL, 
-		CLSCTX_INPROC_SERVER,
-		IID_IOleObject,
-		(void**) &anOleObject)))
-		return 0.0;	
+        IOleObject* anOleObject = NULL;
+        if (FAILED(CoCreateInstance(CLSID_ShockwaveFlash, NULL, 
+                CLSCTX_INPROC_SERVER,
+                IID_IOleObject,
+                (void**) &anOleObject)))
+                return 0.0;     
 
-	IShockwaveFlash* aFlashInterface = NULL;
-	if (FAILED(anOleObject->QueryInterface(__uuidof(IShockwaveFlash), (LPVOID*) &aFlashInterface)))
-		return 0.0;
-	
-	long aVersion = 0;
-	aFlashInterface->FlashVersion(&aVersion);
+        IShockwaveFlash* aFlashInterface = NULL;
+        if (FAILED(anOleObject->QueryInterface(__uuidof(IShockwaveFlash), (LPVOID*) &aFlashInterface)))
+                return 0.0;
+        
+        long aVersion = 0;
+        aFlashInterface->FlashVersion(&aVersion);
 
-	aFlashInterface->Release();
-	anOleObject->Release();
+        aFlashInterface->Release();
+        anOleObject->Release();
 
-	return aVersion / 65536.0;
+        return aVersion / 65536.0;
 }
 
 void FlashWidget::CleanupImages()
 {
-	if (mImage != NULL)
-	{
-		delete mImage;
-		mImage = NULL;
-	}
+        if (mImage != NULL)
+        {
+                delete mImage;
+                mImage = NULL;
+        }
 }
 
 void FlashWidget::RebuildImages()
 {
-	CleanupImages();
+        CleanupImages();
 
-	mImage = new DDImage(gSexyAppBase->mDDInterface);
-	mImage->Create(mWidth, mHeight);
-	mImage->SetImageMode(false, false);	
+        mImage = new DDImage(gSexyAppBase->mDDInterface);
+        mImage->Create(mWidth, mHeight);
+        mImage->SetImageMode(false, false);     
 }
 
 void FlashWidget::CheckCursor()
 {
-	HCURSOR aCursor = GetCursor();
-	if (aCursor == ::LoadCursor(NULL, IDC_ARROW))
-	{
-		mCurCursor = CURSOR_POINTER;
-		gSexyAppBase->mOverrideCursor = NULL;
-		gSexyAppBase->SetCursor(mCurCursor);
-	}
-	else if (aCursor != NULL)
-	{
-		gSexyAppBase->mOverrideCursor = aCursor;
-		mCurCursor = CURSOR_HAND;
-		gSexyAppBase->SetCursor(mCurCursor);
-	}
+        HCURSOR aCursor = GetCursor();
+        if (aCursor == ::LoadCursor(NULL, IDC_ARROW))
+        {
+                mCurCursor = CURSOR_POINTER;
+                gSexyAppBase->mOverrideCursor = NULL;
+                gSexyAppBase->SetCursor(mCurCursor);
+        }
+        else if (aCursor != NULL)
+        {
+                gSexyAppBase->mOverrideCursor = aCursor;
+                mCurCursor = CURSOR_HAND;
+                gSexyAppBase->SetCursor(mCurCursor);
+        }
 }
 
 void FlashWidget::DrawFlashBackground(Graphics* g)
 {
-	if (mBkgColor.mAlpha != 0)
-	{
-		g->SetColor(mBkgColor);
-		g->FillRect(0, 0, mWidth, mHeight);
-	}
+        if (mBkgColor.mAlpha != 0)
+        {
+                g->SetColor(mBkgColor);
+                g->FillRect(0, 0, mWidth, mHeight);
+        }
 
-	if (mBkgImage != NULL)
-	{
-		if ((mBkgImageSrcRect.mWidth != 0) && (mBkgImageSrcRect.mHeight != 0))
-			g->DrawImage(mBkgImage, 0, 0, mBkgImageSrcRect);
-		else
-			g->DrawImage(mBkgImage, 0, 0);
-	}
+        if (mBkgImage != NULL)
+        {
+                if ((mBkgImageSrcRect.mWidth != 0) && (mBkgImageSrcRect.mHeight != 0))
+                        g->DrawImage(mBkgImage, 0, 0, mBkgImageSrcRect);
+                else
+                        g->DrawImage(mBkgImage, 0, 0);
+        }
 }
 
 bool FlashWidget::StartAnimation(const std::string& theFileName)
 {
-	std::string aFullPath = GetFullPath(theFileName);
-	
-	_bstr_t bstr((char*) aFullPath.c_str());		
-	mFlashInterface->put_Movie(bstr); // you have to change the path here	
-	if ((mPauseCount == 0) && (mFlashInterface->Play() != S_OK))
-		return false;	
+        std::string aFullPath = GetFullPath(theFileName);
+        
+        _bstr_t bstr((char*) aFullPath.c_str());                
+        mFlashInterface->put_Movie(bstr); // you have to change the path here   
+        if ((mPauseCount == 0) && (mFlashInterface->Play() != S_OK))
+                return false;   
 
-	if ((mWidgetManager != NULL) && (mIsOver))
-		MouseMove(mWidgetManager->mLastMouseX - mX, mWidgetManager->mLastMouseY - mY);
+        if ((mWidgetManager != NULL) && (mIsOver))
+                MouseMove(mWidgetManager->mLastMouseX - mX, mWidgetManager->mLastMouseY - mY);
 
-	mState = STATE_PLAYING;	
-	return true;
+        mState = STATE_PLAYING; 
+        return true;
 }
 
 void FlashWidget::SetQuality(int theQuality)
 {
-	static char* aQualityNames[3] = {"Low", "Medium", "High"};
-	
-	_bstr_t aNewStr = aQualityNames[theQuality];
-	mFlashInterface->put_Quality2(aNewStr);
+        static char* aQualityNames[3] = {"Low", "Medium", "High"};
+        
+        _bstr_t aNewStr = aQualityNames[theQuality];
+        mFlashInterface->put_Quality2(aNewStr);
 }
 
 void FlashWidget::Pause()
 {
-	mPauseCount++;
+        mPauseCount++;
 
-	if (mState != STATE_STOPPED)
-		mState = STATE_IDLE;
+        if (mState != STATE_STOPPED)
+                mState = STATE_IDLE;
 
-	if ((mPauseCount == 1) && (mFlashInterface != NULL) && (mState != STATE_STOPPED))
-		mFlashInterface->StopPlay();
+        if ((mPauseCount == 1) && (mFlashInterface != NULL) && (mState != STATE_STOPPED))
+                mFlashInterface->StopPlay();
 }
 
 void FlashWidget::Unpause()
 {
-	mPauseCount--;
-	if ((mPauseCount == 0) && (mFlashInterface != NULL) && (mState != STATE_STOPPED))
-	{
-		mState = STATE_PLAYING;
-		mFlashInterface->Play();
-	}
+        mPauseCount--;
+        if ((mPauseCount == 0) && (mFlashInterface != NULL) && (mState != STATE_STOPPED))
+        {
+                mState = STATE_PLAYING;
+                mFlashInterface->Play();
+        }
 }
 
 void FlashWidget::Rewind()
 {
-	if (mFlashInterface != NULL)
-	{
-		mFlashInterface->Rewind();
-		mFlashInterface->Play();
-	}
+        if (mFlashInterface != NULL)
+        {
+                mFlashInterface->Rewind();
+                mFlashInterface->Play();
+        }
 }
 
 void FlashWidget::GotoFrame(int theFrameNum)
 {
-	if (mFlashInterface != NULL)
-	{
-		mFlashInterface->GotoFrame(theFrameNum);
-		mFlashInterface->Play();
-	}
+        if (mFlashInterface != NULL)
+        {
+                mFlashInterface->GotoFrame(theFrameNum);
+                mFlashInterface->Play();
+        }
 }
 
 void FlashWidget::Back()
 {
-	if (mFlashInterface != NULL)
-	{
-		mFlashInterface->Back();
-		mFlashInterface->Play();
-	}
+        if (mFlashInterface != NULL)
+        {
+                mFlashInterface->Back();
+                mFlashInterface->Play();
+        }
 }
 
 void FlashWidget::Forward()
 {
-	if (mFlashInterface != NULL)
-	{
-		mFlashInterface->Forward();
-		mFlashInterface->Play();
-	}
+        if (mFlashInterface != NULL)
+        {
+                mFlashInterface->Forward();
+                mFlashInterface->Play();
+        }
 }
 
 bool FlashWidget::IsPlaying()
 {
-	VARIANT_BOOL aBool = 0;
-	if (mFlashInterface != NULL)
-		mFlashInterface->IsPlaying(&aBool);
-	return aBool != 0;
+        VARIANT_BOOL aBool = 0;
+        if (mFlashInterface != NULL)
+                mFlashInterface->IsPlaying(&aBool);
+        return aBool != 0;
 }
 
 int FlashWidget::GetCurrentFrame()
-{	
-	long aCurrentFrame = -1;
-	if (mFlashInterface != NULL)
-		mFlashInterface->CurrentFrame(&aCurrentFrame);
-	return aCurrentFrame;
+{       
+        long aCurrentFrame = -1;
+        if (mFlashInterface != NULL)
+                mFlashInterface->CurrentFrame(&aCurrentFrame);
+        return aCurrentFrame;
 }
 
 std::string FlashWidget::GetCurrentLabel(const std::string& theTimeline)
 {
-	BSTR aBStr = L"";
-	if (mFlashInterface != NULL)
-		mFlashInterface->TCurrentLabel(_bstr_t(theTimeline.c_str()), &aBStr);
-	return (const char*) _bstr_t(aBStr);
+        BSTR aBStr = L"";
+        if (mFlashInterface != NULL)
+                mFlashInterface->TCurrentLabel(_bstr_t(theTimeline.c_str()), &aBStr);
+        return (const char*) _bstr_t(aBStr);
 }
 
 void FlashWidget::CallFrame(const std::string& theTimeline, int theFrameNum)
 {
-	if (mFlashInterface != NULL)
-		mFlashInterface->TCallFrame(_bstr_t(theTimeline.c_str()), theFrameNum);
+        if (mFlashInterface != NULL)
+                mFlashInterface->TCallFrame(_bstr_t(theTimeline.c_str()), theFrameNum);
 }
 
 void FlashWidget::CallLabel(const std::string& theTimeline, const std::string& theLabel)
 {
-	if (mFlashInterface != NULL)
-		mFlashInterface->TCallLabel(_bstr_t(theTimeline.c_str()), _bstr_t(theLabel.c_str()));
+        if (mFlashInterface != NULL)
+                mFlashInterface->TCallLabel(_bstr_t(theTimeline.c_str()), _bstr_t(theLabel.c_str()));
 }
 
 std::string FlashWidget::GetVariable(const std::string& theName)
 {
-	BSTR aBStr = L"";
-	if (mFlashInterface != NULL)
-		mFlashInterface->GetVariable(_bstr_t(theName.c_str()), &aBStr);
-	return (const char*) _bstr_t(aBStr);
+        BSTR aBStr = L"";
+        if (mFlashInterface != NULL)
+                mFlashInterface->GetVariable(_bstr_t(theName.c_str()), &aBStr);
+        return (const char*) _bstr_t(aBStr);
 }
 
 void FlashWidget::SetVariable(const std::string& theName, const std::string& theValue)
 {
-	if (mFlashInterface != NULL)
-		mFlashInterface->SetVariable(_bstr_t(theName.c_str()), _bstr_t(theValue.c_str()));
+        if (mFlashInterface != NULL)
+                mFlashInterface->SetVariable(_bstr_t(theName.c_str()), _bstr_t(theValue.c_str()));
 }
 
 void FlashWidget::Update()
 {
-	if (mAutoPause)
-	{
-		if (!gSexyAppBase->mHasFocus)
-		{
-			if (!mHasLostFocus)
-			{
-				if (mAutoPause)
-					Pause();
-				mHasLostFocus = true;
-			}
+        if (mAutoPause)
+        {
+                if (!gSexyAppBase->mHasFocus)
+                {
+                        if (!mHasLostFocus)
+                        {
+                                if (mAutoPause)
+                                        Pause();
+                                mHasLostFocus = true;
+                        }
 
-			return;
-		}
-		else
-		{
-			if (mHasLostFocus)
-			{
-				if (mAutoPause)
-					Unpause();
-				mHasLostFocus = false;
-			}
-		}
-	}
+                        return;
+                }
+                else
+                {
+                        if (mHasLostFocus)
+                        {
+                                if (mAutoPause)
+                                        Unpause();
+                                mHasLostFocus = false;
+                        }
+                }
+        }
 
-	if (mState == STATE_PLAYING)
-	{
-		VARIANT_BOOL isPlaying = 0;
-		mFlashInterface->IsPlaying(&isPlaying);	
-		if (!isPlaying)
-		{
-			mState = STATE_STOPPED;
-			if ((mFlashListener != NULL) && (mPauseCount == 0))
-				mFlashListener->FlashAnimEnded(mId);
-		}
-	}
+        if (mState == STATE_PLAYING)
+        {
+                VARIANT_BOOL isPlaying = 0;
+                mFlashInterface->IsPlaying(&isPlaying); 
+                if (!isPlaying)
+                {
+                        mState = STATE_STOPPED;
+                        if ((mFlashListener != NULL) && (mPauseCount == 0))
+                                mFlashListener->FlashAnimEnded(mId);
+                }
+        }
 
-	if (mFlashDirty)
-		MarkDirty();
+        if (mFlashDirty)
+                MarkDirty();
 }
 
 void FlashWidget::Resize(int theX, int theY, int theWidth, int theHeight)
 {
-	Widget::Resize(theX, theY, theWidth, theHeight);
+        Widget::Resize(theX, theY, theWidth, theHeight);
 
-	mDirtyRect = Rect(theX, theY, theWidth, theHeight);	
+        mDirtyRect = Rect(theX, theY, theWidth, theHeight);     
 
-	RebuildImages();
+        RebuildImages();
 
-	IOleInPlaceObject* anInPlaceObject = NULL;	
-	mOleObject->QueryInterface(__uuidof(IOleInPlaceObject), (LPVOID*) &anInPlaceObject);			
+        IOleInPlaceObject* anInPlaceObject = NULL;      
+        mOleObject->QueryInterface(__uuidof(IOleInPlaceObject), (LPVOID*) &anInPlaceObject);                    
 
-	if (anInPlaceObject != NULL)
-	{
-		RECT aRect = GetRect().ToRECT();
-		anInPlaceObject->SetObjectRects(&aRect, &aRect);
-		anInPlaceObject->Release();
-	}
+        if (anInPlaceObject != NULL)
+        {
+                RECT aRect = GetRect().ToRECT();
+                anInPlaceObject->SetObjectRects(&aRect, &aRect);
+                anInPlaceObject->Release();
+        }
 }
 
 void FlashWidget::Draw(Graphics* g)
-{	
-	if (mFlashDirty)
-	{
-		Graphics anImageG(mImage);	
-		DrawFlashBackground(&anImageG);	
+{       
+        if (mFlashDirty)
+        {
+                Graphics anImageG(mImage);      
+                DrawFlashBackground(&anImageG); 
 
-		LPDIRECTDRAWSURFACE aSurface = mImage->GetSurface();
-		if (aSurface == NULL)
-			return;
+                LPDIRECTDRAWSURFACE aSurface = mImage->GetSurface();
+                if (aSurface == NULL)
+                        return;
 
-		HDC aDC = NULL;
-		if (aSurface->GetDC(&aDC) != S_OK)
-			return;	
+                HDC aDC = NULL;
+                if (aSurface->GetDC(&aDC) != S_OK)
+                        return; 
 
-		IViewObject* aViewObject = NULL;
-		mFlashInterface->QueryInterface(IID_IViewObject, (LPVOID*) &aViewObject);
-		if (aViewObject != NULL)
-		{
-			RECTL aRect = {0, 0, mWidth, mHeight};
+                IViewObject* aViewObject = NULL;
+                mFlashInterface->QueryInterface(IID_IViewObject, (LPVOID*) &aViewObject);
+                if (aViewObject != NULL)
+                {
+                        RECTL aRect = {0, 0, mWidth, mHeight};
 
-			Point anAbsPos = GetAbsPos();
+                        Point anAbsPos = GetAbsPos();
 
-			HRGN aRgn = CreateRectRgn(mDirtyRect.mX - anAbsPos.mX, mDirtyRect.mY - anAbsPos.mY, 
-				mDirtyRect.mX + mDirtyRect.mWidth - anAbsPos.mX, 
-				mDirtyRect.mY + mDirtyRect.mHeight - anAbsPos.mY);
-			SelectClipRgn(aDC, aRgn);
-			DeleteObject(aRgn);
+                        HRGN aRgn = CreateRectRgn(mDirtyRect.mX - anAbsPos.mX, mDirtyRect.mY - anAbsPos.mY, 
+                                mDirtyRect.mX + mDirtyRect.mWidth - anAbsPos.mX, 
+                                mDirtyRect.mY + mDirtyRect.mHeight - anAbsPos.mY);
+                        SelectClipRgn(aDC, aRgn);
+                        DeleteObject(aRgn);
 
-			aViewObject->Draw(DVASPECT_CONTENT, 1,
-				NULL, NULL, NULL, aDC, &aRect, NULL, NULL,
-				0);
+                        aViewObject->Draw(DVASPECT_CONTENT, 1,
+                                NULL, NULL, NULL, aDC, &aRect, NULL, NULL,
+                                0);
 
-			aViewObject->Release();
-		}
+                        aViewObject->Release();
+                }
 
-		aSurface->ReleaseDC(aDC);
+                aSurface->ReleaseDC(aDC);
 
-		mFlashDirty = false;
-	}
-	
-	g->DrawImage(mImage, 0, 0);
+                mFlashDirty = false;
+        }
+        
+        g->DrawImage(mImage, 0, 0);
 }
 
 void FlashWidget::MouseMove(int x, int y)
-{	
-	Widget::MouseMove(x, y);
+{       
+        Widget::MouseMove(x, y);
 
-	LRESULT aResult;
-	Point anAbsPos = GetAbsPos();
-	mWindowlessObject->OnWindowMessage(WM_MOUSEMOVE, 0, MAKELPARAM(x + anAbsPos.mX, y + anAbsPos.mY), &aResult);
+        LRESULT aResult;
+        Point anAbsPos = GetAbsPos();
+        mWindowlessObject->OnWindowMessage(WM_MOUSEMOVE, 0, MAKELPARAM(x + anAbsPos.mX, y + anAbsPos.mY), &aResult);
 
-	if (mIsOver)
-		CheckCursor();
+        if (mIsOver)
+                CheckCursor();
 }
 
 void FlashWidget::MouseDown(int x, int y, int theBtnNum, int theClickCount)
 {
-	if (theBtnNum == 0)
-	{
-		LRESULT aResult;
-		Point anAbsPos = GetAbsPos();
-		mWindowlessObject->OnWindowMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(x + anAbsPos.mX, y + anAbsPos.mY), &aResult);
-		CheckCursor();
-	}
+        if (theBtnNum == 0)
+        {
+                LRESULT aResult;
+                Point anAbsPos = GetAbsPos();
+                mWindowlessObject->OnWindowMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(x + anAbsPos.mX, y + anAbsPos.mY), &aResult);
+                CheckCursor();
+        }
 }
 
 void FlashWidget::MouseUp(int x, int y, int theBtnNum, int theClickCount)
 {
-	if (theBtnNum == 0)
-	{
-		LRESULT aResult;
-		Point anAbsPos = GetAbsPos();
-		mWindowlessObject->OnWindowMessage(WM_LBUTTONUP, 0, MAKELPARAM(x + anAbsPos.mX, y + anAbsPos.mY), &aResult);
-		CheckCursor();
-	}
+        if (theBtnNum == 0)
+        {
+                LRESULT aResult;
+                Point anAbsPos = GetAbsPos();
+                mWindowlessObject->OnWindowMessage(WM_LBUTTONUP, 0, MAKELPARAM(x + anAbsPos.mX, y + anAbsPos.mY), &aResult);
+                CheckCursor();
+        }
 }
 
 void FlashWidget::MouseDrag(int x, int y)
 {
-	if (mWidgetManager->IsLeftButtonDown())
-	{
-		LRESULT aResult;
-		Point anAbsPos = GetAbsPos();
-		mWindowlessObject->OnWindowMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(x + anAbsPos.mX, y + anAbsPos.mY), &aResult);
-		CheckCursor();
-	}
+        if (mWidgetManager->IsLeftButtonDown())
+        {
+                LRESULT aResult;
+                Point anAbsPos = GetAbsPos();
+                mWindowlessObject->OnWindowMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(x + anAbsPos.mX, y + anAbsPos.mY), &aResult);
+                CheckCursor();
+        }
 }
 
 void FlashWidget::MouseLeave()
 {
-	Widget::MouseLeave();
+        Widget::MouseLeave();
 
-	// To prevent Flash control from setting our cursor if it thinks 
-	// our mouse is still over something
-	MouseMove(-1, -1);
+        // To prevent Flash control from setting our cursor if it thinks 
+        // our mouse is still over something
+        MouseMove(-1, -1);
 
-	gSexyAppBase->mOverrideCursor = NULL;
-	gSexyAppBase->SetCursor(CURSOR_POINTER);	
+        gSexyAppBase->mOverrideCursor = NULL;
+        gSexyAppBase->SetCursor(CURSOR_POINTER);        
 }
 
 void FlashWidget::SysColorChanged()
 {
-	mFlashDirty = true;
-	mDirtyRect = GetRect();
+        mFlashDirty = true;
+        mDirtyRect = GetRect();
 
-	MarkDirty();
+        MarkDirty();
 }

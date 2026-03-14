@@ -21,6 +21,14 @@
 #include <cstdlib>
 
 #include <windows.h>
+
+// Provide min/max macros when NOMINMAX is defined
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
 #include <shellapi.h> 
 #include <mmsystem.h>
 #include "ModVal.h"

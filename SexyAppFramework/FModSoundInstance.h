@@ -10,21 +10,26 @@ namespace Sexy
 class FModSoundInstance : public SoundInstance
 {
 public:
-	int						mChannelNum;
-	FSOUND_STREAM*			mStream;
+        int                                             mChannelNum;
+        FSOUND_STREAM*                  mStream;
 
 public:
-	FModSoundInstance();
-	virtual ~FModSoundInstance();
-	virtual void			Release();
-		
-	virtual void			SetVolume(double theVolume); 
-	virtual void			SetPan(int thePosition); //-db to +db = left to right
+        FModSoundInstance();
+        virtual ~FModSoundInstance();
+        virtual void                    Release();
+                
+        virtual void                    SetBaseVolume(double theBaseVolume);
+        virtual void                    SetBasePan(int theBasePan);
+        virtual void                    AdjustPitch(double theNumSteps);
 
-	virtual bool			Play(bool looping, bool autoRelease);
-	virtual void			Stop();
-	virtual bool			IsPlaying();
-	virtual bool			IsReleased();
+        virtual void                    SetVolume(double theVolume); 
+        virtual void                    SetPan(int thePosition); //-db to +db = left to right
+
+        virtual bool                    Play(bool looping, bool autoRelease);
+        virtual void                    Stop();
+        virtual bool                    IsPlaying();
+        virtual bool                    IsReleased();
+        virtual double                  GetVolume();
 };
 
 }
