@@ -8,7 +8,3 @@ Open the solution file "PlantsVsZombies.sln" with Visual Studio and compile from
 
 #### Build Tools for Visual Studio (MSBuild)
 Go to the root directory of this project and run ``` msbuild PlantsVsZombies.sln /p:Configuration=Debug /p:Platform=x86 ```.
-
-# Resources
-- [Updated_Base_Decomp.rar](https://drive.google.com/file/d/1blVj5Ulq_SqbPf8WiLzflIHRM5KckPPz/view)
-- [The OFFICIAL PVZ Decomp DOC V.1.8.5](https://docs.google.com/document/d/1_ujwMKrrMgTBfoXoj-wA-FUQdD-vQiZ_v5fC4cc9Yyo/)
