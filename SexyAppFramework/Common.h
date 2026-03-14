@@ -22,8 +22,11 @@
 
 #include <windows.h>
 
-// Provide min/max as template functions when NOMINMAX is defined
-// These provide Windows-compatible min/max without conflicting with std::min/std::max
+// When NOMINMAX is defined, we need to provide min/max in the global namespace
+// for backward compatibility with legacy code. We use using declarations to 
+// bring std::min and std::max into the global namespace.
+#include <algorithm>
+
 namespace Sexy {
 
 template<typename T>
@@ -38,17 +41,9 @@ inline constexpr const T& Max(const T& a, const T& b) {
 
 }
 
-// Global min/max for backward compatibility (used by legacy code that doesn't use std:: or Sexy::)
-// These are template functions, NOT macros, so they don't conflict with std::min/std::max
-template<typename T>
-inline constexpr const T& min(const T& a, const T& b) {
-    return (a < b) ? a : b;
-}
-
-template<typename T>
-inline constexpr const T& max(const T& a, const T& b) {
-    return (a > b) ? a : b;
-}
+// Bring std::min and std::max into global namespace for backward compatibility
+using std::min;
+using std::max;
 #include <shellapi.h> 
 #include <mmsystem.h>
 #include "ModVal.h"
