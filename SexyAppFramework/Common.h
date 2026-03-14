@@ -22,13 +22,33 @@
 
 #include <windows.h>
 
-// Provide min/max macros when NOMINMAX is defined
-#ifndef min
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif
+// Provide min/max as template functions when NOMINMAX is defined
+// These provide Windows-compatible min/max without conflicting with std::min/std::max
+namespace Sexy {
+
+template<typename T>
+inline constexpr const T& Min(const T& a, const T& b) {
+    return (a < b) ? a : b;
+}
+
+template<typename T>
+inline constexpr const T& Max(const T& a, const T& b) {
+    return (a > b) ? a : b;
+}
+
+}
+
+// Global min/max for backward compatibility (used by legacy code that doesn't use std:: or Sexy::)
+// These are template functions, NOT macros, so they don't conflict with std::min/std::max
+template<typename T>
+inline constexpr const T& min(const T& a, const T& b) {
+    return (a < b) ? a : b;
+}
+
+template<typename T>
+inline constexpr const T& max(const T& a, const T& b) {
+    return (a > b) ? a : b;
+}
 #include <shellapi.h> 
 #include <mmsystem.h>
 #include "ModVal.h"
