@@ -49,8 +49,9 @@ set(CMAKE_CXX_FLAGS_INIT "-m32")
 set(CMAKE_C_FLAGS_INIT "${CMAKE_C_FLAGS_INIT} /utf-8 /D_CRT_SECURE_NO_WARNINGS")
 set(CMAKE_CXX_FLAGS_INIT "${CMAKE_CXX_FLAGS_INIT} /utf-8 /D_CRT_SECURE_NO_WARNINGS")
 
-# 32-bit architecture
-set(CMAKE_GENERATOR_PLATFORM Win32 CACHE INTERNAL "")
+# Note: For Ninja generator, do not set CMAKE_GENERATOR_PLATFORM
+# The -m32 flag above handles 32-bit compilation
+# CMAKE_GENERATOR_PLATFORM is only for Visual Studio generators
 
 # Find linker
 find_program(LINKER 
