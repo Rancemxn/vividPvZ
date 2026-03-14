@@ -20,6 +20,16 @@
 #include <algorithm>
 #include <cstdlib>
 
+// Fix for DirectX 8 SDK and newer Windows SDK compatibility
+// The DX8 SDK's basetsd.h defines HANDLE_PTR but Windows SDK uses SHANDLE_PTR
+// We need to define these before windows.h is included
+#if !defined(HANDLE_PTR) && !defined(_WIN64)
+typedef unsigned long HANDLE_PTR;
+#endif
+#if !defined(SHANDLE_PTR) && !defined(_WIN64)
+typedef long SHANDLE_PTR;
+#endif
+
 #include <windows.h>
 
 // When NOMINMAX is defined, we need to provide min/max in the global namespace
@@ -30,12 +40,12 @@
 namespace Sexy {
 
 template<typename T>
-inline constexpr const T& Min(const T& a, const T& b) {
+inline const T& Min(const T& a, const T& b) {
     return (a < b) ? a : b;
 }
 
 template<typename T>
-inline constexpr const T& Max(const T& a, const T& b) {
+inline const T& Max(const T& a, const T& b) {
     return (a > b) ? a : b;
 }
 
