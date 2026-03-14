@@ -3175,10 +3175,10 @@ void DDImage::FillScanLinesWithCoverage(Span* theSpans, int theSpanCount, const 
                 int r = l + theSpans[0].mWidth, b = t;
                 for (int i = 1; i < theSpanCount; ++i)
                 {
-                        l = min(theSpans[i].mX, l);
-                        r = max(theSpans[i].mX + theSpans[i].mWidth - 1, r);
-                        t = min(theSpans[i].mY, t);
-                        b = max(theSpans[i].mY, b);
+                        l = std::min(theSpans[i].mX, l);
+                        r = std::max(theSpans[i].mX + theSpans[i].mWidth - 1, r);
+                        t = std::min(theSpans[i].mY, t);
+                        b = std::max(theSpans[i].mY, b);
                 }
                 for (int i = 0; i < theSpanCount; ++i)
                 {

@@ -19,23 +19,6 @@ public:
         ~CritSect(void);
 };
 
-class AutoCrit
-{
-private:
-        CritSect& mCritSect;
-
-public:
-        AutoCrit(CritSect& theCritSect) : mCritSect(theCritSect)
-        {
-                EnterCriticalSection(&mCritSect.mCriticalSection);
-        }
-
-        ~AutoCrit()
-        {
-                LeaveCriticalSection(&mCritSect.mCriticalSection);
-        }
-};
-
 }
 
 #endif // _H_CritSect

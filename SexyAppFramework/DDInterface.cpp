@@ -332,7 +332,7 @@ int DDInterface::Init(HWND theWindow, bool IsWindowed)
                         rc.right = rc.left + mDisplayWidth;
                         rc.bottom = rc.top + mDisplayHeight;
                         ::AdjustWindowRectEx(&rc, info.dwStyle, false, info.dwExStyle);
-                        ::MoveWindow(theWindow, std::max(0, rc.left), std::max(0, rc.top), rc.right-rc.left, rc.bottom-rc.top, false);
+                        ::MoveWindow(theWindow, std::max(0L, rc.left), std::max(0L, rc.top), rc.right-rc.left, rc.bottom-rc.top, false);
 
                         if ( mApp->mWidescreenAware )
                         {
