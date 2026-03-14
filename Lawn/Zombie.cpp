@@ -5497,7 +5497,7 @@ void Zombie::DrawBungeeTarget(Graphics* g)
     if (mZombiePhase == ZombiePhase::PHASE_BUNGEE_HIT_OUCHY || mZombiePhase == ZombiePhase::PHASE_BUNGEE_RISING)
         return;
     
-    if (mRelatedZombieID != ReanimationID::REANIMATIONID_NULL)
+    if ((int)mRelatedZombieID != (int)ReanimationID::REANIMATIONID_NULL)
         return;
     
     ZombieDrawPosition aDrawPos;
@@ -5915,7 +5915,7 @@ void Zombie::GetDrawPos(ZombieDrawPosition& theDrawPos)
         }
         else
         {
-            float aHeightLimit = min(mPhaseCounter, 40.0f);
+            float aHeightLimit = min((float)mPhaseCounter, 40.0f);
             theDrawPos.mClipHeight = theDrawPos.mBodyY + aHeightLimit;
         }
 
