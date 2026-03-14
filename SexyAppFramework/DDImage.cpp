@@ -7,6 +7,7 @@
 #include "SexyAppBase.h"
 #include "Debug.h"
 #include "PerfTimer.h"
+#include "AutoCrit.h"
 #include <algorithm>
 
 #pragma warning(disable:4005) // macro redefinition
