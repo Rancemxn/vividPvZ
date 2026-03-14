@@ -22,6 +22,33 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# =============================================================================
+# MSVC/Clang-cl Common Settings (Critical for 32-bit Windows builds)
+# =============================================================================
+if(MSVC OR CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+    add_compile_definitions(
+        # 1. 解决 byte 歧义问题 (最关键)
+        # 告诉 C++ 标准库不要定义 std::byte，这样就不会和 Windows 的 byte 冲突
+        _HAS_STD_BYTE=0
+        
+        # 2. 解决 winnt.h 中的 POINTER_64 报错
+        # 在 32 位环境下，有些版本的 Clang-cl 解析 winnt.h 会在这里卡住
+        POINTER_64=
+        
+        # 3. 确保 32 位架构宏正确
+        _X86_
+        
+        # 4. 忽略一些不必要的警告和限制
+        _CRT_SECURE_NO_WARNINGS
+        NOMINMAX
+    )
+    
+    # 针对 Clang-cl 的额外参数
+    add_compile_options(
+        /Zc:wchar_t-  # 很多老游戏代码把 wchar_t 当作无符号短整型，而不是原生类型
+    )
+endif()
+
 # LLVM/Clang specific settings
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message(STATUS "Using LLVM/Clang compiler: ${CMAKE_CXX_COMPILER}")
@@ -40,6 +67,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         -Wno-unused-variable
         -Wno-switch
         -Wno-comment
+        -Wno-error=ambiguous-reversed-operator
+        -Wno-unused-private-field
     )
     
     # Debug flags
@@ -58,9 +87,6 @@ elseif(MSVC)
         /MP  # Multi-processor compilation
         /utf-8
     )
-    
-    # Disable specific warnings
-    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
 # =============================================================================
