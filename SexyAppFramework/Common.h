@@ -44,6 +44,18 @@ inline constexpr const T& Max(const T& a, const T& b) {
 // Bring std::min and std::max into global namespace for backward compatibility
 using std::min;
 using std::max;
+
+// Mixed-type overloads for min/max (needed for legacy code)
+// These handle cases like min(int, double) which std::min doesn't support
+template<typename T1, typename T2>
+inline auto min(const T1& a, const T2& b) -> decltype(a < b ? a : b) {
+    return (a < b) ? a : b;
+}
+
+template<typename T1, typename T2>
+inline auto max(const T1& a, const T2& b) -> decltype(a > b ? a : b) {
+    return (a > b) ? a : b;
+}
 #include <shellapi.h> 
 #include <mmsystem.h>
 #include "ModVal.h"
