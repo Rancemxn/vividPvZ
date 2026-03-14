@@ -167,8 +167,17 @@ file(GLOB LAWN_SYSTEM_SOURCES ${CMAKE_SOURCE_DIR}/Lawn/System/*.cpp)
 # Lawn Widget sources
 file(GLOB LAWN_WIDGET_SOURCES ${CMAKE_SOURCE_DIR}/Lawn/Widget/*.cpp)
 
-# SexyAppFramework sources
-file(GLOB FRAMEWORK_SOURCES ${CMAKE_SOURCE_DIR}/SexyAppFramework/*.cpp)
+# SexyAppFramework sources - Use unified build files like the original vcxproj
+# Many .cpp files are #included in Build files, so we only compile the Build files
+set(FRAMEWORK_SOURCES
+    ${CMAKE_SOURCE_DIR}/SexyAppFramework/GraphicsBuild.cpp
+    ${CMAKE_SOURCE_DIR}/SexyAppFramework/MiscBuildBase.cpp
+    ${CMAKE_SOURCE_DIR}/SexyAppFramework/SoundBuild.cpp
+    ${CMAKE_SOURCE_DIR}/SexyAppFramework/WidgetBuildBase.cpp
+    ${CMAKE_SOURCE_DIR}/SexyAppFramework/SexyApp.cpp
+    ${CMAKE_SOURCE_DIR}/SexyAppFramework/SexyAppBase.cpp
+    ${CMAKE_SOURCE_DIR}/SexyAppFramework/SWTri.cpp
+)
 
 # Sexy.TodLib sources
 file(GLOB TODLIB_SOURCES ${CMAKE_SOURCE_DIR}/Sexy.TodLib/*.cpp)
@@ -179,8 +188,8 @@ file(GLOB IMAGELIB_SOURCES ${CMAKE_SOURCE_DIR}/ImageLib/*.cpp)
 # JPEG library sources (C files)
 file(GLOB JPEG_SOURCES ${CMAKE_SOURCE_DIR}/ImageLib/jpeg/*.c)
 
-# JPEG2000 library sources (C files)
-file(GLOB JPEG2000_SOURCES ${CMAKE_SOURCE_DIR}/ImageLib/jpeg2000/*.c)
+# JPEG2000 library sources (C files) - EXCLUDED from build like in original vcxproj
+set(JPEG2000_SOURCES "")
 
 # PNG library sources (C files)
 file(GLOB PNG_SOURCES ${CMAKE_SOURCE_DIR}/ImageLib/png/*.c)
