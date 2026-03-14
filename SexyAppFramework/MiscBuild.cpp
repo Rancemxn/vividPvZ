@@ -5,7 +5,7 @@
 #include "PerfTimer.cpp"
 #include "MTRand.cpp"
 #include "KeyCodes.cpp"
-#include "InternetManager.cpp"
+// #include "InternetManager.cpp"  // File does not exist
 #include "HTTPTransfer.cpp"
 #include "DirectXErrorString.cpp"
 #include "Debug.cpp"
